@@ -6,18 +6,18 @@ function hasKey<O>(obj: O, key: PropertyKey): key is keyof O {
 }
 
 const items = [
-  {id:1, name:"aa", price: 10.25},
-  {id:2, name:"bb", price: 1.50},
-  {id:3, name:"cc", price: 4.65},
-  {id:4, name:"dd", price: 101.25},
-  {id:5, name:"ee", price: 12.50},
-  {id:6, name:"ff", price: 43.65}
+  {id:1, name:"aa", price: 10.25, imgUrl:"images/1.png"},
+  {id:2, name:"bb", price: 1.50, imgUrl:"images/2.png"},
+  {id:3, name:"cc", price: 4.65, imgUrl:"images/3.png"},
+  {id:4, name:"dd", price: 101.25, imgUrl:"images/4.png"},
+  {id:5, name:"ee", price: 12.50, imgUrl:"images/5.png"},
+  {id:6, name:"ff", price: 43.65, imgUrl:"images/6.png"}
 ];
 
 const tableConfig = {
   idColumn: "id",
   columns: [
-    {name: "id", caption: "ID", type:"a", urlPrefix:"items"},
+    {name: "id", caption: "", type:"imgA", urlPrefix:"items", imgWidth:"70px"},
     {name: "name", caption: "Item Name", type:"a", urlPrefix:"items" },
     {name: "price", caption: "Price", type: "text"}
   ]
@@ -40,19 +40,25 @@ function App() {
         else
           id = "error";
 
-        if(col.type == "a"){
-          const url = col?.urlPrefix + "/" + id;
+        const url = col?.urlPrefix + "/" + id;
+        if(col.type === "a"){
           return(
             <td>
               <a href={url}>{itemText}</a>
             </td>
           )
         }
-        else if(col.type == "text"){
+        else if(col.type === "text"){
           return(
             <td>{itemText}</td>
           )
         }
+        else if(col.type === "imgA"){
+          return(
+            <td><a href={url}><img src={item?.imgUrl} alt="img" width={col.imgWidth ?? "50px"}/></a></td>
+          )
+        }
+        return "";
       }
     )
     return(
