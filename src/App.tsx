@@ -1,9 +1,5 @@
 import './App.css';
-
-//indexing objects
-function hasKey<O>(obj: O, key: PropertyKey): key is keyof O {
-  return key in obj
-}
+import TableRow from './TableRow';
 
 const items = [
   {id:1, name:"aa", price: 10.25, imgUrl:"images/1.png"},
@@ -25,48 +21,9 @@ const tableConfig = {
 
 function App() {
 
-  const tableRows = items.map((item) => {
-    const columns = tableConfig.columns.map(
-      (col) => {
-        let itemText:any = "";
-        if(hasKey(item, col.name))
-          itemText = item[col.name];
-        else
-          itemText = "error";
-
-        let id:any = "";
-        if(hasKey(item, tableConfig.idColumn))
-          id = item[tableConfig.idColumn];
-        else
-          id = "error";
-
-        const url = col?.urlPrefix + "/" + id;
-        if(col.type === "a"){
-          return(
-            <td>
-              <a href={url}>{itemText}</a>
-            </td>
-          )
-        }
-        else if(col.type === "text"){
-          return(
-            <td>{itemText}</td>
-          )
-        }
-        else if(col.type === "imgA"){
-          return(
-            <td><a href={url}><img src={item?.imgUrl} alt="img" width={col.imgWidth ?? "50px"}/></a></td>
-          )
-        }
-        return "";
-      }
-    )
-    return(
-      <tr key={item.id}>
-        {columns}
-      </tr>
-    )
-  });
+  const tableRows = items.map((item) => 
+    <TableRow item={item} tableConfig={tableConfig}/> 
+  );
 
   const tableHeader = tableConfig.columns.map((col) =>
     <th>{col.caption}</th>
@@ -74,9 +31,12 @@ function App() {
 
   return (
     <div className="App">
+
       <table className="table table-striped">
-        {tableHeader}
-        {tableRows}
+        {tableHeader}        
+        <tbody>
+          {tableRows}
+        </tbody>
       </table>
     </div>
   );
