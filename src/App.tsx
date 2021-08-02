@@ -15,6 +15,7 @@ const items = [
 ];
 
 const tableConfig = {
+  idColumn: "id",
   columns: [
     {name: "id", caption: "ID", type:"a", urlPrefix:"items"},
     {name: "name", caption: "Item Name", type:"a", urlPrefix:"items" },
@@ -33,8 +34,14 @@ function App() {
         else
           itemText = "error";
 
+        let id:any = "";
+        if(hasKey(item, tableConfig.idColumn))
+          id = item[tableConfig.idColumn];
+        else
+          id = "error";
+
         if(col.type == "a"){
-          const url = col?.urlPrefix + "/" + item.id;
+          const url = col?.urlPrefix + "/" + id;
           return(
             <td>
               <a href={url}>{itemText}</a>
