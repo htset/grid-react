@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import './App.css';
 import TableRow from './TableRow';
 
@@ -16,17 +17,74 @@ const tableConfig = {
     {name: "id", caption: "", type:"imgA", urlPrefix:"items", imgWidth:"70px"},
     {name: "name", caption: "Item Name", type:"a", urlPrefix:"items" },
     {name: "price", caption: "Price", type: "text"}
-  ]
+  ],
+  sortColumn: "price",
+  sortOrder: "desc"
 }
 
 function App() {
 
-  const tableRows = items.map((item) => 
-    <TableRow item={item} tableConfig={tableConfig}/> 
+  const [sortOrder, setSortOrder] = useState(tableConfig.sortOrder);
+  const [sortColumn, setSortColumn] = useState(tableConfig.sortColumn);
+
+  //indexing objects
+  function hasKey<O>(obj: O, key: PropertyKey): key is keyof O {
+    return key in obj
+  }
+
+  function toggleSortOrder() {
+    setSortOrder((sortOrder === 'asc')? "desc": "asc");
+  }
+
+  function changeTableSort(e: React.MouseEvent){
+    console.log(e);
+    if(sortColumn === e.currentTarget.id){
+      toggleSortOrder();
+    }
+    else{
+      setSortColumn(e.currentTarget.id);
+      setSortOrder("asc");
+    }
+  }
+
+  function tableSorter(a:any, b:any): number {
+    if(hasKey(a, sortColumn) && hasKey(b, sortColumn)){
+      if(sortOrder === "asc"){
+        if(a[sortColumn] < b[sortColumn])
+          return -1;
+        else if(a[sortColumn] === b[sortColumn])
+          return 0;
+        else
+          return 1;
+      }
+      else{
+        if(a[sortColumn] > b[sortColumn])
+          return -1;
+        else if(a[sortColumn] === b[sortColumn])
+          return 0;
+        else
+         return 1;
+      }
+    }
+    else
+      return 0;
+  }
+
+  const tableRows = items.sort(tableSorter).map((item) => 
+    <TableRow item={item} tableConfig={tableConfig} /> 
   );
 
-  const tableHeader = tableConfig.columns.map((col) =>
-    <th>{col.caption}</th>
+  const tableHeader = tableConfig.columns.map((col) => {
+    if(sortColumn === col.name){
+      if(sortOrder === "asc")
+        return(<th id={col.name} onClick={changeTableSort}>{col.caption} /\</th>);
+      else
+        return(<th id={col.name} onClick={changeTableSort}>{col.caption} \/</th>);
+    }
+    else{
+      return(<th id={col.name} onClick={changeTableSort}>{col.caption}</th>);
+    }
+  }
   );
 
   return (
