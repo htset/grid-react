@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
-import TableRow from './TableRow';
-import TableHeader from './TableHeader';
-import TablePagination from './TablePagination';
-import { useEffect } from 'react';
 import { Server } from "miragejs";
+import Table from './Table';
 
 const mockItems = [
   {id:1, name:"aa", price: 10.25, imgUrl:"images/1.png"},
@@ -44,87 +41,26 @@ const tableConfig = {
     {name: "price", caption: "Price", type: "text"}
   ],
   sortColumn: "price",
-  sortOrder: "desc"
+  sortOrder: "desc",
+  pageSize: 3,
+  showPagesCount: 4
 }
 
 function App() {
 
-  const [sortOrder, setSortOrder] = useState(tableConfig.sortOrder);
-  const [sortColumn, setSortColumn] = useState(tableConfig.sortColumn);
-  const [currentPage, setCurrentPage] = useState(1);
   const [items, setItems] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
 
-  const pageSize = 3;
-  const showPagesCount = 4;
-
-  useEffect(() => {
+  function getItems(currentPage:number, pageSize:number) {
     fetch("/api/items?start=" + (currentPage-1)*pageSize + "&offset=" + pageSize)
       .then(response => response.json())
       .then((data) => {
         setItems(data.items);
         setTotalPages(Math.ceil(data.total / pageSize));
       });
-  }, [currentPage]);
-
-  function toggleSortOrder() {
-    setSortOrder((sortOrder === 'asc')? "desc": "asc");
   }
 
-  function changeTableSort(e: React.MouseEvent){
-    console.log(e);
-    if(sortColumn === e.currentTarget.id){
-      toggleSortOrder();
-    }
-    else{
-      setSortColumn(e.currentTarget.id);
-      setSortOrder("asc");
-    }
-  }
-
-  function tableSorter(a:any, b:any): number {
-      if(sortOrder === "asc"){
-        if(a[sortColumn] < b[sortColumn])
-          return -1;
-        else if(a[sortColumn] === b[sortColumn])
-          return 0;
-        else
-          return 1;
-      }
-      else{
-        if(a[sortColumn] > b[sortColumn])
-          return -1;
-        else if(a[sortColumn] === b[sortColumn])
-          return 0;
-        else
-         return 1;
-      }
-  }
-
-  function onChangePage(newPage:number){
-    console.log(newPage);
-    setCurrentPage(newPage);
-  }
-
-  const tableRows = items.sort(tableSorter).map((item:any) => 
-    <TableRow item={item} tableConfig={tableConfig} /> 
-  );
-
-  return (
-    <div className="App">
-      <table className="table table-striped">
-        <TableHeader sortColumn={sortColumn} sortOrder={sortOrder} changeTableSort={changeTableSort} tableConfig={tableConfig}/>       
-        <tbody>
-          {tableRows}
-        </tbody>
-      </table>
-      <TablePagination 
-          currentPage={currentPage} 
-          totalPages={totalPages} 
-          showPagesCount={showPagesCount}
-          onChangePage={onChangePage}/>
-    </div>
-  );
+  return(<Table tableConfig={tableConfig} items={items} totalPages={totalPages} getItems={getItems}/>)
 }
 
 export default App;
