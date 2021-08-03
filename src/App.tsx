@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import TableRow from './TableRow';
 import TableHeader from './TableHeader';
+import TablePagination from './TablePagination';
 
 const items = [
   {id:1, name:"aa", price: 10.25, imgUrl:"images/1.png"},
@@ -9,7 +10,14 @@ const items = [
   {id:3, name:"cc", price: 4.65, imgUrl:"images/3.png"},
   {id:4, name:"dd", price: 101.25, imgUrl:"images/4.png"},
   {id:5, name:"ee", price: 12.50, imgUrl:"images/5.png"},
-  {id:6, name:"ff", price: 43.65, imgUrl:"images/6.png"}
+  {id:6, name:"ff", price: 43.65, imgUrl:"images/6.png"},
+  {id:7, name:"gg", price: 11.65, imgUrl:"images/7.png"},
+  {id:8, name:"hh", price: 1.50, imgUrl:"images/8.png"},
+  {id:9, name:"ii", price: 12.55, imgUrl:"images/9.png"},
+  {id:10, name:"hh", price: 1.50, imgUrl:"images/8.png"},
+  {id:11, name:"ii", price: 12.55, imgUrl:"images/9.png"},
+  {id:12, name:"hh", price: 1.50, imgUrl:"images/8.png"},
+  {id:13, name:"ii", price: 12.55, imgUrl:"images/9.png"}
 ];
 
 const tableConfig = {
@@ -27,6 +35,10 @@ function App() {
 
   const [sortOrder, setSortOrder] = useState(tableConfig.sortOrder);
   const [sortColumn, setSortColumn] = useState(tableConfig.sortColumn);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 3;
+  const showPagesCount = 4;
+  let totalPages = Math.ceil(items.length / pageSize);
 
   function toggleSortOrder() {
     setSortOrder((sortOrder === 'asc')? "desc": "asc");
@@ -62,6 +74,11 @@ function App() {
       }
   }
 
+  function onChangePage(newPage:number){
+    console.log(newPage);
+    setCurrentPage(newPage);
+  }
+
   const tableRows = items.sort(tableSorter).map((item) => 
     <TableRow item={item} tableConfig={tableConfig} /> 
   );
@@ -69,13 +86,18 @@ function App() {
 
   return (
     <div className="App">
-
       <table className="table table-striped">
         <TableHeader sortColumn={sortColumn} sortOrder={sortOrder} changeTableSort={changeTableSort} tableConfig={tableConfig}/>       
         <tbody>
           {tableRows}
         </tbody>
       </table>
+      <TablePagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          showPagesCount={showPagesCount}
+          onChangePage={onChangePage}/>
+
     </div>
   );
 }
