@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import TableRow from './TableRow';
+import TableHeader from './TableHeader';
 
 const items = [
   {id:1, name:"aa", price: 10.25, imgUrl:"images/1.png"},
@@ -27,11 +28,6 @@ function App() {
   const [sortOrder, setSortOrder] = useState(tableConfig.sortOrder);
   const [sortColumn, setSortColumn] = useState(tableConfig.sortColumn);
 
-  //indexing objects
-  function hasKey<O>(obj: O, key: PropertyKey): key is keyof O {
-    return key in obj
-  }
-
   function toggleSortOrder() {
     setSortOrder((sortOrder === 'asc')? "desc": "asc");
   }
@@ -48,7 +44,6 @@ function App() {
   }
 
   function tableSorter(a:any, b:any): number {
-    if(hasKey(a, sortColumn) && hasKey(b, sortColumn)){
       if(sortOrder === "asc"){
         if(a[sortColumn] < b[sortColumn])
           return -1;
@@ -65,33 +60,18 @@ function App() {
         else
          return 1;
       }
-    }
-    else
-      return 0;
   }
 
   const tableRows = items.sort(tableSorter).map((item) => 
     <TableRow item={item} tableConfig={tableConfig} /> 
   );
 
-  const tableHeader = tableConfig.columns.map((col) => {
-    if(sortColumn === col.name){
-      if(sortOrder === "asc")
-        return(<th id={col.name} onClick={changeTableSort}>{col.caption} /\</th>);
-      else
-        return(<th id={col.name} onClick={changeTableSort}>{col.caption} \/</th>);
-    }
-    else{
-      return(<th id={col.name} onClick={changeTableSort}>{col.caption}</th>);
-    }
-  }
-  );
 
   return (
     <div className="App">
 
       <table className="table table-striped">
-        {tableHeader}        
+        <TableHeader sortColumn={sortColumn} sortOrder={sortOrder} changeTableSort={changeTableSort} tableConfig={tableConfig}/>       
         <tbody>
           {tableRows}
         </tbody>
