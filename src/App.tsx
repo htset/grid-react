@@ -3,8 +3,10 @@ import './App.css';
 import TableRow from './TableRow';
 import TableHeader from './TableHeader';
 import TablePagination from './TablePagination';
+import { useEffect } from 'react';
+import { Server } from "miragejs";
 
-const items = [
+const mockItems = [
   {id:1, name:"aa", price: 10.25, imgUrl:"images/1.png"},
   {id:2, name:"bb", price: 1.50, imgUrl:"images/2.png"},
   {id:3, name:"cc", price: 4.65, imgUrl:"images/3.png"},
@@ -19,6 +21,20 @@ const items = [
   {id:12, name:"hh", price: 1.50, imgUrl:"images/8.png"},
   {id:13, name:"ii", price: 12.55, imgUrl:"images/9.png"}
 ];
+
+new Server({
+  routes() {
+    this.namespace = "api";
+
+    this.get("/items/", (schema, request) => {
+      return {
+        items: mockItems.slice(parseInt(request.queryParams.start), parseInt(request.queryParams.start) + parseInt(request.queryParams.offset)),
+        total: mockItems.length
+      }
+    });
+  }
+});
+
 
 const tableConfig = {
   idColumn: "id",
@@ -36,9 +52,20 @@ function App() {
   const [sortOrder, setSortOrder] = useState(tableConfig.sortOrder);
   const [sortColumn, setSortColumn] = useState(tableConfig.sortColumn);
   const [currentPage, setCurrentPage] = useState(1);
+  const [items, setItems] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+
   const pageSize = 3;
   const showPagesCount = 4;
-  let totalPages = Math.ceil(items.length / pageSize);
+
+  useEffect(() => {
+    fetch("/api/items?start=" + (currentPage-1)*pageSize + "&offset=" + pageSize)
+      .then(response => response.json())
+      .then((data) => {
+        setItems(data.items);
+        setTotalPages(Math.ceil(data.total / pageSize));
+      });
+  }, [currentPage]);
 
   function toggleSortOrder() {
     setSortOrder((sortOrder === 'asc')? "desc": "asc");
@@ -79,10 +106,9 @@ function App() {
     setCurrentPage(newPage);
   }
 
-  const tableRows = items.sort(tableSorter).map((item) => 
+  const tableRows = items.sort(tableSorter).map((item:any) => 
     <TableRow item={item} tableConfig={tableConfig} /> 
   );
-
 
   return (
     <div className="App">
@@ -97,7 +123,6 @@ function App() {
           totalPages={totalPages} 
           showPagesCount={showPagesCount}
           onChangePage={onChangePage}/>
-
     </div>
   );
 }
