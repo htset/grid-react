@@ -9,37 +9,37 @@ function TableRow(props: any){
 
     const columns = tableConfig.columns.map(
         (col:any) => {
-        let itemText:any = "";
-        if(hasKey(item, col.name))
-            itemText = item[col.name];
-        else
-            itemText = "error";
+            let itemText:any = "";
+            if(hasKey(item, col.name))
+                itemText = item[col.name];
+            else
+                itemText = "error";
 
-        let id:any = "";
-        if(hasKey(item, tableConfig.idColumn))
-            id = item[tableConfig.idColumn];
-        else
-            id = "error";
+            let id:any = "";
+            if(hasKey(item, tableConfig.idColumn))
+                id = item[tableConfig.idColumn];
+            else
+                id = "error";
 
-        const url = col?.urlPrefix + "/" + id;
-        if(col.type === "a"){
-            return(
-            <td>
-                <a href={url}>{itemText}</a>
-            </td>
-            )
-        }
-        else if(col.type === "text"){
-            return(
-            <td>{itemText}</td>
-            )
-        }
-        else if(col.type === "imgA"){
-            return(
-            <td><a href={url}><img src={item?.imgUrl} alt="img" width={col.imgWidth ?? "50px"}/></a></td>
-            )
-        }
-        return "";
+            const url = col?.urlPrefix + "/" + id;
+            if(col.type === "a"){
+                return(
+                <td key={col.name}>
+                    <a href={url}>{itemText}</a>
+                </td>
+                )
+            }
+            else if(col.type === "text"){
+                return(
+                <td key={col.name}>{itemText}</td>
+                )
+            }
+            else if(col.type === "imgA"){
+                return(
+                <td key={col.name}><a href={url}><img src={item?.imgUrl} alt="img" width={col.imgWidth ?? "50px"}/></a></td>
+                )
+            }
+            return "";
         }
     )
     return(

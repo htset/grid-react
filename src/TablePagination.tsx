@@ -43,6 +43,7 @@ function TablePagination(props:any){
         return(<Pagination.Item 
                     active={item.active} 
                     activeLabel="" 
+                    key={item.page}
                     onClick={() => props.onChangePage(item.page)}>
                         {item.page}
                 </Pagination.Item>);

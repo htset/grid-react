@@ -8,10 +8,11 @@ function Table(props:any){
     const [sortColumn, setSortColumn] = useState(props.tableConfig.sortColumn);
     const [currentPage, setCurrentPage] = useState(1);
 
-        
+    const getItems = props.getItems; 
+    const pageSize = props.tableConfig.pageSize;   
     useEffect(() => {
-        props.getItems(currentPage, props.tableConfig.pageSize)
-    }, [currentPage]);
+        getItems(currentPage, pageSize)
+    }, [currentPage, pageSize]);
 
     function toggleSortOrder() {
         setSortOrder((sortOrder === 'asc')? "desc": "asc");
@@ -53,13 +54,19 @@ function Table(props:any){
       }
     
       const tableRows = props.items.sort(tableSorter).map((item:any) => 
-        <TableRow item={item} tableConfig={props.tableConfig} /> 
+        <TableRow key={item.id} item={item} tableConfig={props.tableConfig} /> 
       );
     
       return (
         <div className="App">
           <table className="table table-striped">
-            <TableHeader sortColumn={sortColumn} sortOrder={sortOrder} changeTableSort={changeTableSort} tableConfig={props.tableConfig}/>       
+            <thead>
+              <TableHeader 
+                sortColumn={sortColumn} 
+                sortOrder={sortOrder} 
+                changeTableSort={changeTableSort} 
+                tableConfig={props.tableConfig}/>       
+            </thead>
             <tbody>
               {tableRows}
             </tbody>
