@@ -16,17 +16,47 @@ const mockItems = [
   {id:10, name:"hh", price: 1.50, imgUrl:"images/8.png"},
   {id:11, name:"ii", price: 12.55, imgUrl:"images/9.png"},
   {id:12, name:"hh", price: 1.50, imgUrl:"images/8.png"},
-  {id:13, name:"ii", price: 12.55, imgUrl:"images/9.png"}
+  {id:13, name:"ii", price: 12.55, imgUrl:"images/9.png"},
+  {id:14, name:"ii", price: 12.55, imgUrl:"images/9.png"}
 ];
 
 new Server({
   routes() {
     this.namespace = "api";
-
+    
     this.get("/items/", (schema, request) => {
+      let filters: any[] = JSON.parse(request.queryParams.filters);
+      let returnItems = mockItems
+        .sort((a:any, b:any) => {
+          if(request.queryParams.sortOrder === "asc"){
+            if(a[request.queryParams.sortColumn] < b[request.queryParams.sortColumn])
+              return -1;
+            else if(a[request.queryParams.sortColumn] === b[request.queryParams.sortColumn])
+              return 0;
+            else
+              return 1;
+          }
+          else{
+            if(a[request.queryParams.sortColumn] > b[request.queryParams.sortColumn])
+              return -1;
+            else if(a[request.queryParams.sortColumn] === b[request.queryParams.sortColumn])
+              return 0;
+            else
+              return 1;
+          }
+        })
+        .filter((item:any) => {
+          let itemShouldBeAdded: boolean = true;
+          filters.forEach((filter:any) => {
+            if(!item[filter.column].toString().includes(filter.value)){
+              itemShouldBeAdded = false;
+            }
+          });
+          return itemShouldBeAdded;
+        });
       return {
-        items: mockItems.slice(parseInt(request.queryParams.start), parseInt(request.queryParams.start) + parseInt(request.queryParams.offset)),
-        total: mockItems.length
+        items: returnItems.slice(parseInt(request.queryParams.start), parseInt(request.queryParams.start) + parseInt(request.queryParams.offset)),
+        total: returnItems.length
       }
     });
   }
@@ -51,8 +81,9 @@ function App() {
   const [items, setItems] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
 
-  function getItems(currentPage:number, pageSize:number) {
-    fetch("/api/items?start=" + (currentPage-1)*pageSize + "&offset=" + pageSize)
+  function getItems(currentPage:number, pageSize:number, filters:any[], sortColumn:string, sortOrder:string) {
+
+    fetch("/api/items?start=" + (currentPage-1)*pageSize + "&offset=" + pageSize + "&filters=" + JSON.stringify(filters) + "&sortColumn=" + sortColumn + "&sortOrder=" + sortOrder)
       .then(response => response.json())
       .then((data) => {
         setItems(data.items);

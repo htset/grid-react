@@ -35,7 +35,7 @@ function TablePagination(props:any){
     }
 
     //finally, pad to the left
-    if(addedPagesToArray < props.showPagesCount && pageNumbers.length > 0){
+    if(addedPagesToArray < props.showPagesCount && pageNumbers.length > 0 && pageNumbers[0].page > 1){
         pageNumbers.unshift({page: pageNumbers[0].page - 1, active: false});
     }
 
